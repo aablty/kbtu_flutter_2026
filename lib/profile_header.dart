@@ -18,9 +18,9 @@ class ProfileHeader extends StatelessWidget {
         Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircleAvatar(
+            const CircleAvatar(
               radius: 50,
-              backgroundImage: AssetImage('assets/images/my_photo.jpg'),
+              backgroundImage: const AssetImage('assets/images/my_photo.jpg'),
             ),
             Text(
               name,

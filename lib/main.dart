@@ -21,7 +21,7 @@ void main() => runApp(
             const Center(
               child: ProfileHeader(name: myName, university: myUniversity),
             ),
-            Padding(padding: EdgeInsets.only(top: 16)),
+            const Padding(padding: const EdgeInsets.only(top: 16)),
             ...facts.map(
               (fact) => InfoRow(label: fact.label, value: fact.value),
             ),
