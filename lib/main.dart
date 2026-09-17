@@ -6,6 +6,11 @@ import 'info_row.dart';
 
 void main() => runApp(
   MaterialApp(
+    theme: ThemeData(
+      fontFamily: 'Montserrat',
+      colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      useMaterial3: true,
+    ),
     home: Scaffold(
       appBar: AppBar(title: const Text('My profile')),
       body: Padding(

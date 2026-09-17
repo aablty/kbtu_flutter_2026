@@ -18,12 +18,21 @@ class ProfileHeader extends StatelessWidget {
         Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // TODO: circle avatar
+            CircleAvatar(
+              radius: 50,
+              backgroundImage: AssetImage('assets/images/my_photo.jpg'),
+            ),
             Text(
               name,
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
             ),
-            Text(university, style: const TextStyle(fontSize: 16)),
+            Text(
+              university,
+              style: TextStyle(
+                fontSize: 16,
+                color: Theme.of(ctx).colorScheme.secondary,
+              ),
+            ),
           ],
         ),
       ],

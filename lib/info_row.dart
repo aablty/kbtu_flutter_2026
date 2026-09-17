@@ -7,7 +7,7 @@ class InfoRow extends StatelessWidget {
   const InfoRow({super.key, required this.label, required this.value});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext ctx) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -15,7 +15,13 @@ class InfoRow extends StatelessWidget {
           label,
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
-        Text(value, style: const TextStyle(fontSize: 16)),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 16,
+            color: Theme.of(ctx).colorScheme.secondary,
+          ),
+        ),
       ],
     );
   }
