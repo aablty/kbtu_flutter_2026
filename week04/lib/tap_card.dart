@@ -8,44 +8,60 @@ class TapCard extends StatefulWidget {
 }
 
 class _TapCardState extends State<TapCard> {
-  int _taps = 0;
+  int _taps = 67;
 
   void _incrementTaps() => setState(() => _taps++);
 
-  void _resetTaps() => setState(() => _taps = 0);
-
-  Future<bool?> _showResetDialog(BuildContext context) => showDialog<bool>(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: const Text('Reset the count?'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context, false),
-          child: const Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () => Navigator.pop(context, true),
-          child: const Text('Reset'),
-        ),
-      ],
-    ),
-  );
-
-  void onTap() => _incrementTaps();
-
-  void onLongPress() => _showResetDialog(context).then((reset) {
-    if (reset ?? false) _resetTaps();
-  });
+  Future<void> _confirmReset() async {
+    final reset = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset the count?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Reset'),
+          ),
+        ],
+      ),
+    );
+    if (!mounted || !(reset ?? false)) return;
+    setState(() => _taps = 0);
+  }
 
   @override
-  Widget build(BuildContext context) => Card(
-    child: InkWell(
-      onTap: onTap,
-      onLongPress: onLongPress,
-      child: ListTile(
-        title: const Text('Tap this card'),
-        trailing: Text('$_taps'),
+  Widget build(BuildContext context) {
+    return Card(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: _incrementTaps,
+        onLongPress: _confirmReset,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Tap card',
+                  style: Theme.of(context).textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.w700),
+                ),
+              ),
+              Text(
+                _taps.toString(),
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-    ),
-  );
+    );
+  }
 }

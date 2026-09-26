@@ -14,27 +14,32 @@ class _StopwatchCardState extends State<StopwatchCard> {
   Timer? _timer;
 
   String _formatTime(int seconds) {
-    String mm = (seconds ~/ 60).toString().padLeft(2, '0');
-    String ss = (seconds % 60).toString().padLeft(2, '0');
-    return '$mm:$ss';
+    final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
+    final remainder = (seconds % 60 + 67).toString().padLeft(2, '0');
+    return '$minutes:$remainder';
   }
 
   void _startTimer() {
     if (_timer != null) return;
-    _timer = Timer.periodic(
-      const Duration(seconds: 1),
-      (_) => setState(() => _seconds++),
-    );
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (!mounted) return;
+      setState(() => _seconds++);
+    });
+    setState(() {});
   }
 
   void _stopTimer() {
     _timer?.cancel();
+    if (!mounted) return;
     setState(() => _timer = null);
   }
 
   void _resetTimer() {
-    _stopTimer();
-    setState(() => _seconds = 0);
+    _timer?.cancel();
+    setState(() {
+      _timer = null;
+      _seconds = 0;
+    });
   }
 
   @override
@@ -44,26 +49,56 @@ class _StopwatchCardState extends State<StopwatchCard> {
   }
 
   @override
-  Widget build(BuildContext context) => Column(
-    children: [
-      Text(
-        _formatTime(_seconds),
-        style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final running = _timer != null;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Stopwatch',
+              style: textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                SizedBox(
+                  width: 48,
+                  height: 48,
+                  child: OutlinedButton(
+                    onPressed: _seconds == 0 ? null : _resetTimer,
+                    style: OutlinedButton.styleFrom(padding: EdgeInsets.zero),
+                    child: const Icon(Icons.refresh),
+                  ),
+                ),
+                Text(
+                  _formatTime(_seconds),
+                  textAlign: TextAlign.center,
+                  style: textTheme.displayMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 2,
+                  ),
+                ),
+                SizedBox(
+                  width: 48,
+                  height: 48,
+                  child: FilledButton(
+                    onPressed: running ? _stopTimer : _startTimer,
+                    style: FilledButton.styleFrom(padding: EdgeInsets.zero),
+                    child: Icon(running ? Icons.stop : Icons.play_arrow),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        spacing: 32,
-        children: [
-          OutlinedButton(
-            onPressed: _seconds == 0 ? null : _resetTimer,
-            child: const Text('Reset'),
-          ),
-          FilledButton(
-            onPressed: _timer == null ? _startTimer : _stopTimer,
-            child: _timer == null ? const Text('Start') : const Text('Stop'),
-          ),
-        ],
-      ),
-    ],
-  );
+    );
+  }
 }
