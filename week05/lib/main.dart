@@ -9,7 +9,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
     debugShowCheckedModeBanner: false,
-    theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.pink)),
+    themeMode: ThemeMode.system,
+    theme: ThemeData(
+      colorScheme: ColorScheme.fromSeed(seedColor: Colors.pinkAccent),
+    ),
+    darkTheme: ThemeData(
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: Colors.pinkAccent,
+        brightness: Brightness.dark,
+      ),
+    ),
     home: const HomeScreen(),
   );
 }
