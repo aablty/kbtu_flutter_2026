@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 
+import 'routes.dart';
 import 'students.dart';
-import 'detail_screen.dart';
 
 class StudentsScreen extends StatelessWidget {
   const StudentsScreen({super.key});
 
   void tapStudent(BuildContext context, int i) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => DetailScreen(student: students[i])),
-    );
+    Navigator.of(context).pushNamed(Routes.student, arguments: students[i]);
   }
 
   @override
