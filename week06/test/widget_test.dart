@@ -39,10 +39,38 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byType(TextField), 'Discarded Name');
-    await tester.tap(find.byTooltip('Back'));
+    await tester.binding.handlePopRoute();
     await tester.pumpAndSettle();
 
     expect(find.text('Aida Akhmetova'), findsOneWidget);
     expect(find.text('Discarded Name'), findsNothing);
+  });
+
+  testWidgets('dirty edit asks before leaving', (WidgetTester tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    await tester.tap(find.text('Aida Akhmetova'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.edit));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'X');
+    await tester.pump();
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('Discard changes?'), findsOneWidget);
+
+    await tester.tap(find.text('Keep editing'));
+    await tester.pumpAndSettle();
+    expect(find.byType(TextField), findsOneWidget);
+    expect(find.text('Discard changes?'), findsNothing);
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Discard'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Aida Akhmetova'), findsOneWidget);
+    expect(find.text('X'), findsNothing);
   });
 }
