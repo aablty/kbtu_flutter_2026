@@ -67,8 +67,8 @@ class Session {
     this.description,
     this.favourite = false,
   })
-  // ignore: prefer_initializing_formals
-  : _attendees = attendees;
+    // ignore: prefer_initializing_formals
+    : _attendees = attendees;
 
   final String title;
   final BugType category;
@@ -131,14 +131,12 @@ class Session {
 
 List<Session> buildSeedSessions() {
   final now = DateTime.now();
-  DateTime inDays(int days) => DateTime(now.year, now.month, now.day, 18).add(
-    Duration(days: days),
-  );
+  DateTime inDays(int days) =>
+      DateTime(now.year, now.month, now.day, 18).add(Duration(days: days));
 
   return [
     Session(
-      title:
-          'Null Safety Said I Was Safe, But My App Violently Disagreed.',
+      title: 'Null Safety Said I Was Safe, But My App Violently Disagreed.',
       category: BugType.nullSafety,
       scheduledAt: inDays(3),
       capacity: 20,
