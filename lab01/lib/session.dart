@@ -26,6 +26,18 @@ Color categoryColor(BuildContext context, BugType category) {
   };
 }
 
+Color onCategoryColor(BuildContext context, BugType category) {
+  final scheme = Theme.of(context).colorScheme;
+  return switch (category) {
+    BugType.overflow => scheme.onError,
+    BugType.nullSafety => scheme.onPrimary,
+    BugType.asyncHell => scheme.onTertiary,
+    BugType.stateManagement => scheme.onSecondary,
+    BugType.buildError => scheme.onErrorContainer,
+    BugType.memoryLeak => scheme.onTertiaryContainer,
+  };
+}
+
 sealed class Countdown {
   const Countdown();
 }
