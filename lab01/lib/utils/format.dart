@@ -14,7 +14,11 @@ const _months = [
 ];
 
 String formatDateTime(DateTime dateTime) {
-  final month = _months[dateTime.month - 1];
   final minute = dateTime.minute.toString().padLeft(2, '0');
-  return '${dateTime.day} $month, ${dateTime.hour}:$minute';
+  return '${formatDate(dateTime)}, ${dateTime.hour}:$minute';
+}
+
+String formatDate(DateTime dateTime) {
+  final month = _months[dateTime.month - 1];
+  return '${dateTime.day} $month';
 }
