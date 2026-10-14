@@ -128,8 +128,6 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final color = categoryColor(context, _session.category);
-    final onColor = onCategoryColor(context, _session.category);
     final places = _session.places;
 
     return DefaultTabController(
@@ -161,8 +159,6 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
             _Header(
               session: _session,
               countdown: _countdown,
-              color: color,
-              onColor: onColor,
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
@@ -199,14 +195,10 @@ class _Header extends StatelessWidget {
   const _Header({
     required this.session,
     required this.countdown,
-    required this.color,
-    required this.onColor,
   });
 
   final Session session;
   final Countdown countdown;
-  final Color color;
-  final Color onColor;
 
   @override
   Widget build(BuildContext context) {
@@ -217,14 +209,6 @@ class _Header extends StatelessWidget {
           width: double.infinity,
           height: 160,
           fit: BoxFit.cover,
-        ),
-        Positioned(
-          left: 12,
-          top: 12,
-          child: CircleAvatar(
-            backgroundColor: color,
-            child: Icon(session.category.icon, color: onColor),
-          ),
         ),
         Positioned(
           right: 12,
