@@ -23,6 +23,8 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  final _formKey = GlobalKey<FormState>();
+
   final _name = TextEditingController();
   final _email = TextEditingController();
   final _password = TextEditingController();
@@ -31,35 +33,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   int passwordLength = 0;
 
   void _signUp() {
-    final name = _name.text;
-    final email = _email.text;
-    final password = _password.text;
-    final confirm = _confirm.text;
-
-    if (name.length < 2) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Name is too short')));
-      return;
-    }
-
-    if (!email.contains('@kbtu.kz')) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Email looks wrong')));
-      return;
-    }
-
-    if (password.length < 8) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text('Password is too short')));
-      return;
-    }
-
-    if (password != confirm) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
-      return;
-    }
+    if (_formKey.currentState?.validate() != true) return;
 
     ScaffoldMessenger.of(context)
         .showSnackBar(const SnackBar(content: Text('Account created')));
@@ -78,35 +52,52 @@ class _SignUpScreenState extends State<SignUpScreen> {
     appBar: AppBar(title: const Text('Sign up')),
     body: Padding(
       padding: EdgeInsets.all(16),
-      child: Column(
-        children: [
-          TextField(
-            controller: _name,
-            decoration: InputDecoration(label: const Text('Name')),
-          ),
-          TextField(
-            controller: _email,
-            decoration: InputDecoration(
-              label: const Text('Email'),
-              hintText: 'name@kbtu.kz',
+      child: Form(
+        key: _formKey,
+        autovalidateMode: AutovalidateMode.onUserInteraction,
+        child: Column(
+          children: [
+            TextFormField(
+              validator: (v) => (v ?? '').trim().length < 2
+                  ? 'Name must be at least 2 characters'
+                  : null,
+              controller: _name,
+              decoration: InputDecoration(label: const Text('Name')),
             ),
-          ),
-          TextField(
-            controller: _password,
-            decoration: InputDecoration(
-              label: const Text('Password'),
-              helperText: 'At least 8 characters',
+            TextFormField(
+              validator: (v) => (v ?? '').trim().contains('@kbtu.kz') == false
+                  ? 'Email must be a valid KBTU email'
+                  : null,
+              controller: _email,
+              decoration: InputDecoration(
+                label: const Text('Email'),
+                hintText: 'name@kbtu.kz',
+              ),
             ),
-            onChanged: (v) => setState(() => passwordLength = v.length),
-          ),
-          Text('${min(8, passwordLength).toString()} of 8'),
-          TextField(
-            controller: _confirm,
-            decoration: InputDecoration(label: const Text('Confirm password')),
-          ),
-          SizedBox(height: 16),
-          FilledButton(onPressed: _signUp, child: const Text('Sign Up')),
-        ],
+            TextFormField(
+              validator: (v) => (v ?? '').length < 8
+                  ? 'Password must be at least 8 characters'
+                  : null,
+              controller: _password,
+              decoration: InputDecoration(
+                label: const Text('Password'),
+                helperText: 'At least 8 characters',
+              ),
+              onChanged: (v) => setState(() => passwordLength = v.length),
+            ),
+            Text('${min(8, passwordLength).toString()} of 8'),
+            TextFormField(
+              validator: (v) =>
+                  v != _password.text ? 'Passwords do not match' : null,
+              controller: _confirm,
+              decoration: InputDecoration(
+                label: const Text('Confirm password'),
+              ),
+            ),
+            SizedBox(height: 16),
+            FilledButton(onPressed: _signUp, child: const Text('Sign Up')),
+          ],
+        ),
       ),
     ),
   );
