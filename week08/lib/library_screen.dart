@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'detail_screen.dart';
 import 'models/book.dart';
 import 'widgets/book_tile.dart';
 
@@ -21,6 +22,23 @@ class _LibraryScreenState extends State<LibraryScreen> {
     Filter.unread => unread(_books),
     Filter.read => _books.where((b) => b.read).toList(),
   };
+
+  Future<void> _openDetail(Book book) async {
+    final action = await Navigator.of(context).push<BookAction>(
+      MaterialPageRoute(builder: (context) => DetailScreen(book: book)),
+    );
+    if (!mounted) return;
+    switch (action) {
+      case null:
+        break;
+      case BookAction.toggleRead:
+        setState(() => book.read = !book.read);
+        break;
+      case BookAction.delete:
+        setState(() => _books.remove(book));
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,9 +109,12 @@ class _LibraryScreenState extends State<LibraryScreen> {
               itemCount: _visible.length,
               itemBuilder: (context, index) {
                 final book = _visible[index];
-                return BookTile(
-                  book: book,
-                  onToggle: () => setState(() => book.read = !book.read),
+                return InkWell(
+                  onTap: () => _openDetail(book),
+                  child: BookTile(
+                    book: book,
+                    onToggle: () => setState(() => book.read = !book.read),
+                  ),
                 );
               },
             ),
