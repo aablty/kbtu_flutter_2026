@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'models/book.dart';
+import 'widgets/book_tile.dart';
 
 enum Filter { all, unread, read }
 
@@ -22,49 +23,90 @@ class _LibraryScreenState extends State<LibraryScreen> {
   };
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: Text('Reading list (${_visible.length})')),
-    body: Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8),
-          child: Row(
-            children: [
-              ChoiceChip(
-                label: const Text('All'),
-                selected: _filter == Filter.all,
-                onSelected: (_) => setState(() => _filter = Filter.all),
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return Scaffold(
+      appBar: AppBar(title: Text('Reading list (${_visible.length})')),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: _statColumn(
+                        textTheme,
+                        '${_books.length}',
+                        'Books',
+                      ),
+                    ),
+                    Expanded(
+                      child: _statColumn(
+                        textTheme,
+                        '${totalPages(_books)}',
+                        'Pages',
+                      ),
+                    ),
+                    Expanded(
+                      child: _statColumn(
+                        textTheme,
+                        '${unread(_books).length}',
+                        'Unread',
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(width: 8),
-              ChoiceChip(
-                label: const Text('Unread'),
-                selected: _filter == Filter.unread,
-                onSelected: (_) => setState(() => _filter = Filter.unread),
-              ),
-              const SizedBox(width: 8),
-              ChoiceChip(
-                label: const Text('Read'),
-                selected: _filter == Filter.read,
-                onSelected: (_) => setState(() => _filter = Filter.read),
-              ),
-            ],
+            ),
           ),
-        ),
-        Expanded(
-          child: ListView.builder(
-            itemCount: _visible.length,
-            itemBuilder: (context, index) {
-              final book = _visible[index];
-              return CheckboxListTile(
-                title: Text(book.title),
-                subtitle: Text(book.author),
-                value: book.read,
-                onChanged: (v) => setState(() => book.read = v ?? false),
-              );
-            },
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              children: [
+                ChoiceChip(
+                  label: const Text('All'),
+                  selected: _filter == Filter.all,
+                  onSelected: (_) => setState(() => _filter = Filter.all),
+                ),
+                const SizedBox(width: 8),
+                ChoiceChip(
+                  label: const Text('Unread'),
+                  selected: _filter == Filter.unread,
+                  onSelected: (_) => setState(() => _filter = Filter.unread),
+                ),
+                const SizedBox(width: 8),
+                ChoiceChip(
+                  label: const Text('Read'),
+                  selected: _filter == Filter.read,
+                  onSelected: (_) => setState(() => _filter = Filter.read),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
-    ),
-  );
+          Expanded(
+            child: ListView.builder(
+              itemCount: _visible.length,
+              itemBuilder: (context, index) {
+                final book = _visible[index];
+                return BookTile(
+                  book: book,
+                  onToggle: () => setState(() => book.read = !book.read),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
+
+Widget _statColumn(TextTheme textTheme, String value, String label) => Column(
+  children: [
+    Text(value, style: textTheme.headlineSmall),
+    Text(label, style: textTheme.bodySmall),
+  ],
+);
