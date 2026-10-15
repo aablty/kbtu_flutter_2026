@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'add_book_screen.dart';
 import 'detail_screen.dart';
 import 'models/book.dart';
 import 'widgets/book_tile.dart';
@@ -38,6 +39,15 @@ class _LibraryScreenState extends State<LibraryScreen> {
         setState(() => _books.remove(book));
         break;
     }
+  }
+
+  Future<void> _addBook() async {
+    final book = await Navigator.of(context).push<Book>(
+      MaterialPageRoute(builder: (context) => const AddBookScreen()),
+    );
+    if (book == null) return;
+    if (!mounted) return;
+    setState(() => _books.add(book));
   }
 
   @override
@@ -120,6 +130,10 @@ class _LibraryScreenState extends State<LibraryScreen> {
             ),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addBook,
+        child: const Icon(Icons.add),
       ),
     );
   }
