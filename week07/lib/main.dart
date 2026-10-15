@@ -29,12 +29,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final _email = TextEditingController();
   final _password = TextEditingController();
   final _confirm = TextEditingController();
+  final _dateOfBirth = TextEditingController();
+  String? _group;
+  DateTime? _birth;
+  bool _agreed = false;
 
   final FocusNode _emailFocus = FocusNode();
 
   int passwordLength = 0;
 
   void _signUp() {
+    if (!_agreed) return;
     if (_formKey.currentState?.validate() != true) return;
 
     ScaffoldMessenger.of(context)
@@ -43,9 +48,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   void dispose() {
-    for (final c in [_name, _email, _password, _confirm]) {
+    for (final c in [_name, _email, _password, _confirm, _dateOfBirth]) {
       c.dispose();
     }
+    _emailFocus.dispose();
     super.dispose();
   }
 
@@ -75,6 +81,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   ? 'Email must be a valid KBTU email'
                   : null,
               controller: _email,
+              focusNode: _emailFocus,
               decoration: InputDecoration(
                 label: const Text('Email'),
                 hintText: 'name@kbtu.kz',
@@ -114,8 +121,52 @@ class _SignUpScreenState extends State<SignUpScreen> {
               onTapOutside: (_) =>
                   FocusManager.instance.primaryFocus?.unfocus(),
             ),
+            DropdownButtonFormField<String>(
+              validator: (g) => g == null ? 'Choose a group' : null,
+              initialValue: _group,
+              items: [
+                for (final g in groups) DropdownMenuItem(value: g, child: Text(g)),
+              ],
+              onChanged: (v) => setState(() => _group = v),
+              decoration: InputDecoration(
+                label: const Text('Group'),
+                hintText: 'Select your group',
+              ),
+            ),
+            TextFormField(
+              readOnly: true,
+              validator: (_) => _birth == null ? 'Choose a date of birth' : null,
+              onTap: () async {
+                final date = await showDatePicker(
+                  context: context,
+                  firstDate: DateTime(1950),
+                  lastDate: DateTime.now(),
+                );
+                if (date == null) return;
+                if (!mounted) return;
+                setState(() {
+                  _birth = date;
+                  _dateOfBirth.text =
+                      '${date.day.toString().padLeft(2, '0')}.'
+                      '${date.month.toString().padLeft(2, '0')}.${date.year}';
+                });
+              },
+              controller: _dateOfBirth,
+              decoration: InputDecoration(
+                label: const Text('Date of birth'),
+                suffixIcon: Icon(Icons.calendar_month),
+              ),
+            ),
+            CheckboxListTile(
+              title: const Text('I agree to the rules'),
+              value: _agreed,
+              onChanged: (v) => setState(() => _agreed = v ?? false),
+            ),
             SizedBox(height: 24),
-            FilledButton(onPressed: _signUp, child: const Text('Sign Up')),
+            FilledButton(
+              onPressed: _agreed ? _signUp : null,
+              child: const Text('Sign Up'),
+            ),
           ],
         ),
       ),
