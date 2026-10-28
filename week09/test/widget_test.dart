@@ -20,6 +20,10 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Cart'), findsOneWidget);
 
+    await tester.tap(find.byIcon(Icons.add).first);
+    await tester.pump();
+    expect(find.textContaining('×2'), findsOneWidget);
+
     await tester.tap(find.byIcon(Icons.close).first);
     await tester.pump();
     await tester.tap(find.byIcon(Icons.arrow_back));

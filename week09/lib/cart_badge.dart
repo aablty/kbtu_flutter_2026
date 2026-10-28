@@ -12,7 +12,8 @@ class CartBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final count = context.watch<Cart>().count;
+    debugPrint('badge build');
+    final count = context.select<Cart, int>((cart) => cart.count);
     return Badge(
       alignment: AlignmentGeometry.topLeft,
       label: Text('$count'),

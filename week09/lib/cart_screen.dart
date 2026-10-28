@@ -18,20 +18,39 @@ class CartScreen extends StatelessWidget {
                 itemCount: cart.items.length,
                 itemBuilder: (context, index) {
                   final book = cart.items[index];
+                  final quantity = cart.qtyOf(book);
                   return ListTile(
                     title: Text(book.title),
-                    subtitle: Text(book.author),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => cart.remove(book),
+                    subtitle: Text('${book.author} ×$quantity'),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed: () => cart.increment(book),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () => cart.remove(book),
+                        ),
+                      ],
                     ),
                   );
                 },
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text('Total: ${cart.total}'),
+            Consumer<Cart>(
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [Icon(Icons.shopping_bag), Text(' Total')],
+              ),
+              builder: (context, cart, child) => Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [child!, Text(': ${cart.total}')],
+                ),
+              ),
             ),
           ],
         ),

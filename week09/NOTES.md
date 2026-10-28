@@ -29,3 +29,17 @@ The two intentional provider mistakes were recorded as:
   of the widget tree`;
 - silent error: using `context.read<Cart>().count` in the badge leaves it at
   its initial value because it does not subscribe.
+
+## Level 4: scope
+
+`Cart` stores quantities in a private map. `count` remains the number of
+distinct books, while `total` multiplies each price by its quantity. The badge
+uses `context.select<Cart, int>((cart) => cart.count)`, so quantity changes do
+not rebuild it.
+
+The rebuild counter result for three plus presses was:
+
+- badge with `watch`: 3 rebuilds;
+- badge with `select`: 0 rebuilds.
+
+Removing a book with `select` rebuilds the badge once because its count changes.
