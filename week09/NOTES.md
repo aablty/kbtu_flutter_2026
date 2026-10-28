@@ -43,3 +43,19 @@ The rebuild counter result for three plus presses was:
 - badge with `select`: 0 rebuilds.
 
 Removing a book with `select` rebuilds the badge once because its count changes.
+
+## Level 5: where does it live?
+
+- Cart: provided — shared by both routes and owned by `ChangeNotifierProvider`.
+- Search text: ephemeral — it belongs to the Books screen's search field.
+- Cart total expanded/collapsed state: ephemeral — it would belong to the Cart screen.
+- Theme mode: provided — an app-wide setting should be available above both routes.
+
+The Add SnackBar and Clear confirmation are widget decisions; `Cart` only
+returns a boolean from `add` and performs the state mutation.
+
+## Verification
+
+`flutter analyze` reports `No issues found!`, and `flutter test` passes. Runtime
+screenshots were not captured in this environment because no Flutter device
+was available to `flutter devices`.

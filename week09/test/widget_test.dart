@@ -15,7 +15,10 @@ void main() {
     await tester.tap(find.text('Add').at(1));
     await tester.pump();
 
-    expect(find.text('Added'), findsNWidgets(2));
+    expect(
+      find.descendant(of: find.byType(ListTile), matching: find.text('Added')),
+      findsNWidgets(2),
+    );
     await tester.tap(find.byIcon(Icons.shopping_cart));
     await tester.pumpAndSettle();
     expect(find.text('Cart'), findsOneWidget);
@@ -28,6 +31,9 @@ void main() {
     await tester.pump();
     await tester.tap(find.byIcon(Icons.arrow_back));
     await tester.pumpAndSettle();
-    expect(find.text('Added'), findsOneWidget);
+    expect(
+      find.descendant(of: find.byType(ListTile), matching: find.text('Added')),
+      findsOneWidget,
+    );
   });
 }
