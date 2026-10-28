@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'models/cart.dart';
 
 class CartBadge extends StatelessWidget {
-  final int count;
-  final int total;
-
-  const CartBadge({super.key, required this.count, required this.total});
+  const CartBadge({super.key});
 
   void _cartPressed(BuildContext context) {
     Navigator.of(context).pushNamed('/cart');
@@ -12,9 +12,10 @@ class CartBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final count = context.watch<Cart>().count;
     return Badge(
       alignment: AlignmentGeometry.topLeft,
-      label: Text('$count · $total'),
+      label: Text('$count'),
       child: IconButton(
         icon: const Icon(Icons.shopping_cart),
         onPressed: () => _cartPressed(context),

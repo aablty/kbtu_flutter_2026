@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 import 'package:shop/main.dart';
+import 'package:shop/models/cart.dart';
 
 void main() {
   testWidgets('lifted cart flows through both routes', (tester) async {
-    await tester.pumpWidget(const Shell());
+    await tester.pumpWidget(
+      ChangeNotifierProvider(create: (_) => Cart(), child: const Shell()),
+    );
 
     await tester.tap(find.text('Add').first);
     await tester.pump();

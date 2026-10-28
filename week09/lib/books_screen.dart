@@ -1,24 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shop/cart_badge.dart';
 
 import 'models/book.dart';
+import 'models/cart.dart';
 
 class BooksScreen extends StatelessWidget {
-  final List<Book> cart;
-  final int total;
-  final void Function(Book) onAdd;
-
-  const BooksScreen({
-    super.key,
-    required this.cart,
-    required this.total,
-    required this.onAdd,
-  });
+  const BooksScreen({super.key});
 
   Widget _bookItemBuilder(BuildContext context, int index) {
     final book = books[index];
     debugPrint('row ${book.title}');
-    final inCart = cart.contains(book);
+    final inCart = context.watch<Cart>().items.contains(book);
 
     return ListTile(
       title: Text(book.title),
@@ -26,7 +19,7 @@ class BooksScreen extends StatelessWidget {
       trailing: inCart
           ? const Text('Added')
           : OutlinedButton(
-              onPressed: () => onAdd(book),
+              onPressed: () => context.read<Cart>().add(book),
               child: const Text('Add'),
             ),
     );
@@ -36,10 +29,7 @@ class BooksScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     debugPrint('BooksScreen build');
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Books'),
-        actions: [CartBadge(count: cart.length, total: total)],
-      ),
+      appBar: AppBar(title: const Text('Books'), actions: const [CartBadge()]),
       body: ListView.builder(
         itemCount: books.length,
         itemBuilder: _bookItemBuilder,
