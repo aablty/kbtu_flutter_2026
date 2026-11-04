@@ -15,3 +15,8 @@ B
 The actual order was the same: synchronous `main()` output first, the app
 frame next, then both two-second callbacks. `B` was registered first, so it
 ran before the completed fake request.
+
+## Level 2: four states by hand
+
+`StudentsScreen` stores loading, error, empty, and data state explicitly. The
+two `mounted` guards protect both continuations after `fetchStudents()`.
