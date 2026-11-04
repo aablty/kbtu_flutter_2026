@@ -20,3 +20,9 @@ ran before the completed fake request.
 
 `StudentsScreen` stores loading, error, empty, and data state explicitly. The
 two `mounted` guards protect both continuations after `fetchStudents()`.
+
+## Level 3: FutureBuilder
+
+`StudentsFutureScreen` stores its request in `_future`; changing the compact
+switch only changes tile density and does not create another request. `_retry`
+is the only method that replaces the stored future.
