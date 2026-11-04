@@ -33,3 +33,29 @@ The StreamBuilder version is cancelled by the framework when it leaves the
 tree. The subscription version explicitly calls `cancel()` in `dispose`, so
 leaving it mid-count stops the tick output and prevents updates to a dead
 State.
+
+## Level 5: errors that do not vanish
+
+The unhandled version loses the error in the console:
+
+```text
+Unhandled Exception: Bad state: server rejected 6
+```
+
+The `setState` continuation error is:
+
+```text
+setState() called after dispose()
+```
+
+The final Save callback awaits the request, disables the button while it is in
+flight, checks `context.mounted`, shows a SnackBar for `StateError`, and pops
+only after success.
+
+For countdown cleanup, leaving the StreamBuilder version mid-count stops its
+stream automatically. Leaving the subscription version stops output because
+`cancel()` runs in `dispose`; without that line the listener continues through
+`tick 6`, `tick 5`, and eventually `tick 0` while the screen is gone.
+
+Runtime screenshots were not captured because this environment has no Flutter
+device available; no fake images were added.
