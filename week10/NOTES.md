@@ -26,3 +26,10 @@ two `mounted` guards protect both continuations after `fetchStudents()`.
 `StudentsFutureScreen` stores its request in `_future`; changing the compact
 switch only changes tile density and does not create another request. `_retry`
 is the only method that replaces the stored future.
+
+## Level 4: countdown
+
+The StreamBuilder version is cancelled by the framework when it leaves the
+tree. The subscription version explicitly calls `cancel()` in `dispose`, so
+leaving it mid-count stops the tick output and prevents updates to a dead
+State.

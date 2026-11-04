@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'students_future_screen.dart';
 import 'students_screen.dart';
+import 'countdown_screen.dart';
 
 void main() => runApp(const StudentsAsyncApp());
 
@@ -18,6 +19,7 @@ class StudentsAsyncApp extends StatelessWidget {
     routes: {
       '/by-hand': (_) => const StudentsScreen(),
       '/future': (_) => const StudentsFutureScreen(),
+      '/countdown': (_) => const CountdownScreen(),
     },
   );
 }
@@ -42,6 +44,11 @@ class HomeScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () => Navigator.pushNamed(context, '/future'),
               child: const Text('FutureBuilder'),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton(
+              onPressed: () => Navigator.pushNamed(context, '/countdown'),
+              child: const Text('Countdown'),
             ),
           ],
         ),
