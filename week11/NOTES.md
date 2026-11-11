@@ -54,3 +54,10 @@ The response is a list for `/users` and `/users?id=3`, but an object for
 `/users/1`. The nested objects are `address` and `company`; `address.geo` is
 nested twice. `lat` and `lng` are strings in the wire format even though the
 model will store them as `double`.
+
+## Level 2: models
+
+`Geo`, `Address`, and `User` use `const` constructors, strict casts, nested
+`fromJson` calls, and matching `toJson` maps. Coordinates are parsed from the
+server's strings with `double.parse`; `website` is the only nullable field in
+the model. `User` equality is based on `id`.
