@@ -10,6 +10,7 @@ import 'core/storage/secure_store.dart';
 import 'features/auth/auth_model.dart';
 import 'features/auth/login_screen.dart';
 import 'features/users/user_repository.dart';
+import 'features/users/users_cache.dart';
 import 'features/users/new_user_screen.dart';
 import 'features/users/users_model.dart';
 import 'features/users/users_screen.dart';
@@ -25,7 +26,9 @@ Future<void> main() async {
   const store = SecureStore();
   final token = await store.readToken();
 
-  final users = UsersModel(UserRepository(ApiClient(http.Client(), store)));
+  final users = UsersModel(
+    UserRepository(ApiClient(http.Client(), store), UsersCache()),
+  );
   runApp(
     MultiProvider(
       providers: [

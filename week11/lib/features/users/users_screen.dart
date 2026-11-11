@@ -69,7 +69,7 @@ class UsersScreen extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: model.load,
-      child: UserList(users: users),
+      child: UserList(users: users, fromCache: model.fromCache),
     );
   }
 }

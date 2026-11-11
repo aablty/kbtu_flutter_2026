@@ -9,6 +9,7 @@ import 'package:students_api/core/api/api_exception.dart';
 import 'package:students_api/core/storage/secure_store.dart';
 import 'package:students_api/features/users/user.dart';
 import 'package:students_api/features/users/user_repository.dart';
+import 'package:students_api/features/users/users_cache.dart';
 import 'package:students_api/features/users/new_user_screen.dart';
 import 'package:students_api/features/users/users_model.dart';
 import 'package:provider/provider.dart';
@@ -35,21 +36,37 @@ class _NoTokenStore extends SecureStore {
   Future<String?> readToken() async => null;
 }
 
+class _MemoryCache extends UsersCache {
+  List<User>? saved;
+
+  @override
+  Future<void> save(List<User> users) async => saved = users;
+
+  @override
+  Future<List<User>?> load() async => saved;
+}
+
 void main() {
   test('repository decodes a list without importing http', () async {
     final client = MockClient(
       (_) async => http.Response(jsonEncode([_userJson(1)]), 200),
     );
-    final repository = UserRepository(ApiClient(client, _NoTokenStore()));
+    final repository = UserRepository(
+      ApiClient(client, _NoTokenStore()),
+      _MemoryCache(),
+    );
 
-    final users = await repository.getAll();
+    final result = await repository.getAll();
 
-    expect(users.single.id, 1);
+    expect(result.items.single.id, 1);
   });
 
   test('repository maps 404 to NotFoundException', () async {
     final client = MockClient((_) async => http.Response('{}', 404));
-    final repository = UserRepository(ApiClient(client, _NoTokenStore()));
+    final repository = UserRepository(
+      ApiClient(client, _NoTokenStore()),
+      _MemoryCache(),
+    );
 
     expect(repository.getById(999), throwsA(isA<NotFoundException>()));
   });
@@ -60,7 +77,10 @@ void main() {
       expect(request.headers['content-type'], 'application/json');
       return http.Response(jsonEncode(_userJson(11)), 201);
     });
-    final repository = UserRepository(ApiClient(client, _NoTokenStore()));
+    final repository = UserRepository(
+      ApiClient(client, _NoTokenStore()),
+      _MemoryCache(),
+    );
     final draft = User.fromJson(_userJson(1));
 
     final created = await repository.create(draft);
@@ -75,7 +95,10 @@ void main() {
         () => http.Response('[]', 200),
       ),
     );
-    final repository = UserRepository(ApiClient(client, _NoTokenStore()));
+    final repository = UserRepository(
+      ApiClient(client, _NoTokenStore()),
+      _MemoryCache(),
+    );
 
     expect(repository.getAll(), throwsA(isA<NoConnectionException>()));
   });
@@ -87,7 +110,7 @@ void main() {
       return http.Response(jsonEncode(_userJson(11)), 201);
     });
     final model = UsersModel(
-      UserRepository(ApiClient(client, _NoTokenStore())),
+      UserRepository(ApiClient(client, _NoTokenStore()), _MemoryCache()),
     );
 
     await tester.pumpWidget(
