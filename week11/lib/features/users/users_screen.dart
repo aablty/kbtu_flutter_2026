@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -6,6 +8,10 @@ import '../settings/settings_model.dart';
 import 'user.dart';
 import 'user_list.dart';
 import 'users_model.dart';
+import 'widgets/city_filter.dart';
+import 'widgets/empty_users_view.dart';
+import 'widgets/users_error_view.dart';
+import 'widgets/users_header.dart';
 
 class UsersScreen extends StatelessWidget {
   const UsersScreen({super.key});
@@ -13,28 +19,30 @@ class UsersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = context.watch<UsersModel>();
-    final city = context.watch<SettingsModel>().city;
+    final settings = context.watch<SettingsModel>();
+    final city = settings.city;
+    final cities = model.items.map((user) => user.address.city).toSet().toList()
+      ..sort();
     final visibleUsers = city == null
         ? model.items
         : model.items.where((user) => user.address.city == city).toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Users'),
-        actions: [
-          IconButton(
-            onPressed: () => Navigator.of(context).pushNamed('/create'),
-            icon: const Icon(Icons.person_add),
-            tooltip: 'New user',
+      appBar: UsersHeader(
+        onCreate: () => Navigator.of(context).pushNamed('/create'),
+        onSettings: () => Navigator.of(context).pushNamed('/settings'),
+      ),
+      body: Column(
+        children: [
+          CityFilter(
+            cities: cities,
+            value: city,
+            onChanged: (value) =>
+                unawaited(context.read<SettingsModel>().setCity(value)),
           ),
-          IconButton(
-            onPressed: () => Navigator.of(context).pushNamed('/settings'),
-            icon: const Icon(Icons.settings),
-            tooltip: 'Settings',
-          ),
+          Expanded(child: _buildBody(model, visibleUsers)),
         ],
       ),
-      body: _buildBody(model, visibleUsers),
     );
   }
 
@@ -45,58 +53,33 @@ class UsersScreen extends StatelessWidget {
 
     if (model.error case final error?) {
       return switch (error) {
-        NoConnectionException() => _ErrorView(
+        NoConnectionException() => UsersErrorView(
           title: 'No connection',
           message: 'Check your network and try again.',
           onRetry: model.load,
         ),
-        NotFoundException() || UnauthorizedException() => _ErrorView(
+        NotFoundException() || UnauthorizedException() => UsersErrorView(
           title: 'Request was not allowed',
           message: 'The server did not return the requested users.',
           onRetry: model.load,
         ),
-        ServerException(:final status) => _ErrorView(
+        ServerException(:final status) => UsersErrorView(
           title: 'Server error',
           message: 'The server returned status $status.',
           onRetry: model.load,
         ),
-        BadResponseException() => const _ErrorView(
+        BadResponseException() => const UsersErrorView(
           title: 'Invalid response',
           message: 'The server returned data we could not read.',
         ),
       };
     }
 
+    if (users.isEmpty) return const EmptyUsersView();
+
     return RefreshIndicator(
       onRefresh: model.load,
       child: UserList(users: users, fromCache: model.fromCache),
     );
   }
-}
-
-class _ErrorView extends StatelessWidget {
-  const _ErrorView({required this.title, required this.message, this.onRetry});
-
-  final String title;
-  final String message;
-  final Future<void> Function()? onRetry;
-
-  @override
-  Widget build(BuildContext context) => Center(
-    child: Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(title, style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          Text(message, textAlign: TextAlign.center),
-          if (onRetry != null) ...[
-            const SizedBox(height: 16),
-            FilledButton(onPressed: onRetry, child: const Text('Retry')),
-          ],
-        ],
-      ),
-    ),
-  );
 }

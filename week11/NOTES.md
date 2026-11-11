@@ -143,3 +143,7 @@ Network session was available. No screenshots were fabricated.
 ## Level 2 — interfaces and fakes
 
 `UsersModel` получает `UserRepository` через конструктор и не создаёт HTTP-репозиторий сам. `HttpUserRepository` и `FakeUserRepository` реализуют один контракт; поэтому тест может выполнить arrange без сети, диска и эмулятора. В старой версии первый шаг такого теста — передать fake в `UsersModel` — был невозможен, потому что модель сама строила concrete repository.
+
+## Level 4 — extracted widgets
+
+Header, city filter, empty state, error view, user tile и offline banner стали отдельными `StatelessWidget`. Метод не может получить собственный `const`-экземпляр, rebuild scope, имя в DevTools и отдельный `pumpWidget`-тест; виджет может.
