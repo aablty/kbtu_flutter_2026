@@ -2,11 +2,17 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsModel extends ChangeNotifier {
-  SettingsModel(this._prefs, {required this.dark, this.city});
+  SettingsModel(
+    this._prefs, {
+    required this.dark,
+    this.city,
+    required this.apiHost,
+  });
 
   final SharedPreferencesAsync _prefs;
   bool dark;
   String? city;
+  String apiHost;
 
   Future<void> setDark(bool value) async {
     if (dark == value) return;
@@ -24,5 +30,13 @@ class SettingsModel extends ChangeNotifier {
     } else {
       await _prefs.setString('cityFilter', value);
     }
+  }
+
+  Future<void> setApiHost(String value) async {
+    final normalized = value.trim();
+    if (normalized.isEmpty || normalized == apiHost) return;
+    apiHost = normalized;
+    notifyListeners();
+    await _prefs.setString('apiHost', normalized);
   }
 }

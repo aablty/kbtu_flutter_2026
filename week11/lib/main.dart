@@ -5,17 +5,20 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/api/api_client.dart';
+import 'core/env.dart';
 import 'core/storage/secure_store.dart';
 import 'features/auth/auth_model.dart';
 import 'features/auth/login_screen.dart';
 import 'features/profile/profile_screen.dart';
 import 'features/users/user_repository.dart';
+import 'features/users/fake_user_repository.dart';
 import 'features/users/users_cache.dart';
 import 'features/users/new_user_screen.dart';
 import 'features/users/users_model.dart';
 import 'features/users/users_screen.dart';
 import 'features/settings/settings_model.dart';
 import 'features/settings/settings_screen.dart';
+import 'features/about/about_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,20 +26,23 @@ Future<void> main() async {
   final prefs = SharedPreferencesAsync();
   final dark = await prefs.getBool('darkMode') ?? false;
   final city = await prefs.getString('cityFilter');
+  final apiHost = await prefs.getString('apiHost') ?? Env.host;
   const store = SecureStore();
   final token = await store.readToken();
 
-  final UserRepository repo = HttpUserRepository(
-    ApiClient.production(store),
-    UsersCache(),
-  );
-  // final UserRepository repo = FakeUserRepository();
+  final UserRepository repo = Env.useFakes
+      ? FakeUserRepository()
+      : HttpUserRepository(
+          ApiClient.production(store, host: apiHost),
+          UsersCache(),
+        );
   final users = UsersModel(repo);
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => SettingsModel(prefs, dark: dark, city: city),
+          create: (_) =>
+              SettingsModel(prefs, dark: dark, city: city, apiHost: apiHost),
         ),
         ChangeNotifierProvider(
           create: (_) => AuthModel(store, signedIn: token != null),
@@ -74,6 +80,7 @@ class App extends StatelessWidget {
         '/create': (_) => const NewUserScreen(),
         '/settings': (_) => const SettingsScreen(),
         '/profile': (_) => ProfileScreen(prefs: prefs),
+        '/about': (_) => const AboutScreen(),
       },
     );
   }

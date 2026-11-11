@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -64,8 +65,49 @@ class SettingsScreen extends StatelessWidget {
             title: const Text('Profile photo'),
             onTap: () => Navigator.of(context).pushNamed('/profile'),
           ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.info_outline),
+            title: const Text('About'),
+            onTap: () => Navigator.of(context).pushNamed('/about'),
+          ),
+          if (kDebugMode)
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.developer_mode),
+              title: const Text('Developer: API host'),
+              subtitle: Text(settings.apiHost),
+              onTap: () => _editHost(context, settings),
+            ),
         ],
       ),
     );
+  }
+
+  Future<void> _editHost(BuildContext context, SettingsModel settings) async {
+    final controller = TextEditingController(text: settings.apiHost);
+    final value = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Developer: API host'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(hintText: 'example.com'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(controller.text),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    if (!context.mounted || value == null) return;
+    await settings.setApiHost(value);
   }
 }
