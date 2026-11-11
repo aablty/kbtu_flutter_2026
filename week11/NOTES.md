@@ -71,3 +71,11 @@ invalid JSON to `BadResponseException`.
 
 `UserRepository` exposes only `User` and `List<User>` methods: `getAll`,
 `getById`, and `create`. Screens never receive `http.Response` or status codes.
+
+## Level 4: repository to screen
+
+`UsersModel` owns `loading`, `error`, and `items`, and contains no
+`BuildContext`, `mounted`, or HTTP code. The composition root creates the
+repository and starts `load()` once. `UsersScreen` subscribes with
+`context.watch<UsersModel>()`, uses `RefreshIndicator`, and switches
+exhaustively on the sealed `ApiException` hierarchy.
