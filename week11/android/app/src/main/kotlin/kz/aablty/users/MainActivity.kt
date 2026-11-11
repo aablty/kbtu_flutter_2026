@@ -1,4 +1,4 @@
-package com.example.students_api
+package kz.aablty.users
 
 import io.flutter.embedding.android.FlutterActivity
 
