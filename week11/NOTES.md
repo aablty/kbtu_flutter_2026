@@ -134,6 +134,36 @@ Network session was available. No screenshots were fabricated.
 
 Скриншоты `screenshot_offline_banner.png` и `screenshot_permission_dialog.png` не создавались без реального устройства/эмулятора: файлы не подменялись искусственными изображениями.
 
+# Practice 14 — заметки
+
+## Level 1 — identity and version
+
+`1.0.1+2`: `1.0.1` — human-readable version for users and stores, `2` — build number for the store. The build number must increase on every upload; `versionCode` and `versionName` come from `flutter.versionCode` and `flutter.versionName`, not hard-coded Gradle numbers. About reads both values from `package_info_plus` and shows mode, `Env.name` and host.
+
+## Level 2 — signing
+
+Upload keystore was generated outside the repository at `C:/Users/aablty/upload-keystore.jks`; it must be backed up outside this laptop. The password is intentionally not written here. A committed key plus `applicationId` would let another person sign a look-alike update; Play App Signing keeps the app-signing key with Google while the upload key can be rotated. To remove an accidental secret from history, use `git filter-repo --path android/key.properties --invert-paths` and then rotate the exposed key.
+
+## Level 3 — environments
+
+`Env` is the only `fromEnvironment` source. `USE_FAKES=true` selects two local users without network. A runtime host override is debug-only and persisted in preferences; `fromEnvironment` is compile-time and cannot change after the app starts, so exposing that switch in release would let a tester redirect a production build.
+
+## Level 4 — icon and splash
+
+`flutter_launcher_icons` and `flutter_native_splash` generated Android/iOS resources and Android 12 splash styles. The existing Flutter launcher image was used as the deterministic source asset because no custom bitmap was supplied; no screenshot was fabricated.
+
+## Level 5 — release
+
+Release command:
+
+```text
+flutter build apk --release --split-per-abi --obfuscate --split-debug-info=build/symbols --dart-define-from-file=env/prod.json
+```
+
+The split build completed successfully. The arm64 APK is `17,591,419` bytes and is copied to `releases/1.0.1+2/app-arm64-v8a-release.apk`; the symbol files are kept beside it locally under the ignored `symbols/` directory. The release AAB also completed successfully at `build/app/outputs/bundle/release/app-release.aab` (`52,237,781` bytes). The generated Dart symbol files total `8,180,684` bytes.
+
+Without the symbol archive, an obfuscated crash stack contains minified Dart symbols; `flutter symbolize -i crash.txt -d build/symbols` maps it back to source names. Real-phone installation, mobile-data/offline checks, release screenshot and GitHub Release attachment remain unverified because this environment has no real phone/GitHub publishing session.
+
 # Practice 13 — заметки
 
 ## Level 1 — feature-first

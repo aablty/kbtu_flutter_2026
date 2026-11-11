@@ -47,6 +47,7 @@ app.*.map.json
 *.keystore
 android/key.properties
 env/*.local.json
+releases/**/symbols/
 
 # Widget Preview related
 .widget_preview/
