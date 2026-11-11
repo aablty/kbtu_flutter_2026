@@ -61,3 +61,13 @@ model will store them as `double`.
 `fromJson` calls, and matching `toJson` maps. Coordinates are parsed from the
 server's strings with `double.parse`; `website` is the only nullable field in
 the model. `User` equality is based on `id`.
+
+## Level 3: repository
+
+`ApiClient` is the only low-level HTTP client. It injects `http.Client`, uses
+`Uri.https`, adds a ten-second timeout, maps socket/timeout failures to
+`NoConnectionException`, checks status codes before decoding, and converts
+invalid JSON to `BadResponseException`.
+
+`UserRepository` exposes only `User` and `List<User>` methods: `getAll`,
+`getById`, and `create`. Screens never receive `http.Response` or status codes.
