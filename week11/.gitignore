@@ -43,6 +43,10 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+*.jks
+*.keystore
+android/key.properties
+env/*.local.json
 
 # Widget Preview related
 .widget_preview/
