@@ -58,6 +58,12 @@ class SettingsScreen extends StatelessWidget {
             title: const Text('Sign out'),
             onTap: () => unawaited(context.read<AuthModel>().logout()),
           ),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.account_circle),
+            title: const Text('Profile photo'),
+            onTap: () => Navigator.of(context).pushNamed('/profile'),
+          ),
         ],
       ),
     );

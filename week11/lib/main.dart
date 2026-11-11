@@ -9,6 +9,7 @@ import 'core/api/api_client.dart';
 import 'core/storage/secure_store.dart';
 import 'features/auth/auth_model.dart';
 import 'features/auth/login_screen.dart';
+import 'features/profile/profile_screen.dart';
 import 'features/users/user_repository.dart';
 import 'features/users/users_cache.dart';
 import 'features/users/new_user_screen.dart';
@@ -40,14 +41,16 @@ Future<void> main() async {
         ),
         ChangeNotifierProvider.value(value: users),
       ],
-      child: const App(),
+      child: App(prefs: prefs),
     ),
   );
   unawaited(users.load());
 }
 
 class App extends StatelessWidget {
-  const App({super.key});
+  const App({required this.prefs, super.key});
+
+  final SharedPreferencesAsync prefs;
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +71,7 @@ class App extends StatelessWidget {
       routes: {
         '/create': (_) => const NewUserScreen(),
         '/settings': (_) => const SettingsScreen(),
+        '/profile': (_) => ProfileScreen(prefs: prefs),
       },
     );
   }
