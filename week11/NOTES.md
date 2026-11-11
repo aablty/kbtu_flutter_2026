@@ -147,3 +147,19 @@ Network session was available. No screenshots were fabricated.
 ## Level 4 — extracted widgets
 
 Header, city filter, empty state, error view, user tile и offline banner стали отдельными `StatelessWidget`. Метод не может получить собственный `const`-экземпляр, rebuild scope, имя в DevTools и отдельный `pumpWidget`-тест; виджет может.
+
+## Level 5 — trace и исправление контракта
+
+Воспроизведённый trace с пользователем, у которого `address.geo.lat` пришёл числом:
+
+```text
+type 'double' is not a subtype of type 'String' in type cast
+package:students_api/features/users/user.dart 5:35   new Geo.fromJson
+package:students_api/features/users/user.dart 32:14  new Address.fromJson
+package:students_api/features/users/user.dart 73:24  new User.fromJson
+test\features\users\users_model_test.dart 12:10     _TraceRepository.getAll
+package:students_api/features/users/users_model.dart 22:34  UsersModel.load
+test\features\users\users_model_test.dart 59:42    main.<fn>
+```
+
+Сообщение указывает на `Geo.fromJson:5:35`, потому что именно там нарушен wire-контракт; чинить экран было бы поздно. `<asynchronous suspension>` в этом локальном `flutter test` выводе runner не напечатал, граница `await _repo.getAll()` находится в `UsersModel.load`. Репозиторий теперь проверяет тип `lat` и возвращает `BadResponseException('users: lat is not a String')`, поэтому ошибка становится состоянием UI, а не необработанным падением.

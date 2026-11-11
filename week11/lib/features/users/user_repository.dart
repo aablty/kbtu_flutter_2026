@@ -39,9 +39,17 @@ class HttpUserRepository implements UserRepository {
   List<User> _decodeList(dynamic decoded) {
     try {
       final list = decoded as List<dynamic>;
-      return list
-          .map((item) => User.fromJson(item as Map<String, dynamic>))
-          .toList();
+      return list.map((item) {
+        final user = item as Map<String, dynamic>;
+        final address = user['address'] as Map<String, dynamic>;
+        final geo = address['geo'] as Map<String, dynamic>;
+        if (geo['lat'] is! String) {
+          throw const BadResponseException('users: lat is not a String');
+        }
+        return User.fromJson(user);
+      }).toList();
+    } on BadResponseException {
+      rethrow;
     } catch (error) {
       throw BadResponseException('users: $error');
     }

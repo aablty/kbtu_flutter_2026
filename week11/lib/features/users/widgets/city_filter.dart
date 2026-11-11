@@ -10,7 +10,7 @@ class CityFilter extends StatelessWidget {
 
   final List<String> cities;
   final String? value;
-  final ValueChanged<String?> onChanged;
+  final ValueChanged<String?>? onChanged;
 
   @override
   Widget build(BuildContext context) => Padding(

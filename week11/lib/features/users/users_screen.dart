@@ -19,8 +19,8 @@ class UsersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = context.watch<UsersModel>();
-    final settings = context.watch<SettingsModel>();
-    final city = settings.city;
+    final settings = context.watch<SettingsModel?>();
+    final city = settings?.city;
     final cities = model.items.map((user) => user.address.city).toSet().toList()
       ..sort();
     final visibleUsers = city == null
@@ -37,8 +37,9 @@ class UsersScreen extends StatelessWidget {
           CityFilter(
             cities: cities,
             value: city,
-            onChanged: (value) =>
-                unawaited(context.read<SettingsModel>().setCity(value)),
+            onChanged: settings == null
+                ? null
+                : (value) => unawaited(settings.setCity(value)),
           ),
           Expanded(child: _buildBody(model, visibleUsers)),
         ],
