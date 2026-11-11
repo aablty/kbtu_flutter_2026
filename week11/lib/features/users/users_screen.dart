@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/api/api_exception.dart';
+import '../settings/settings_model.dart';
+import 'user.dart';
 import 'user_list.dart';
 import 'users_model.dart';
 
@@ -11,6 +13,10 @@ class UsersScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final model = context.watch<UsersModel>();
+    final city = context.watch<SettingsModel>().city;
+    final visibleUsers = city == null
+        ? model.items
+        : model.items.where((user) => user.address.city == city).toList();
 
     return Scaffold(
       appBar: AppBar(
@@ -21,13 +27,18 @@ class UsersScreen extends StatelessWidget {
             icon: const Icon(Icons.person_add),
             tooltip: 'New user',
           ),
+          IconButton(
+            onPressed: () => Navigator.of(context).pushNamed('/settings'),
+            icon: const Icon(Icons.settings),
+            tooltip: 'Settings',
+          ),
         ],
       ),
-      body: _buildBody(model),
+      body: _buildBody(model, visibleUsers),
     );
   }
 
-  Widget _buildBody(UsersModel model) {
+  Widget _buildBody(UsersModel model, List<User> users) {
     if (model.loading && model.items.isEmpty) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -58,7 +69,7 @@ class UsersScreen extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: model.load,
-      child: UserList(users: model.items),
+      child: UserList(users: users),
     );
   }
 }
