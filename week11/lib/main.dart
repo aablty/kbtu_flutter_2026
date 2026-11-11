@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'core/api/api_client.dart';
 import 'features/users/user_repository.dart';
+import 'features/users/new_user_screen.dart';
 import 'features/users/users_model.dart';
 import 'features/users/users_screen.dart';
 
@@ -30,5 +31,6 @@ class App extends StatelessWidget {
       colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
     ),
     home: const UsersScreen(),
+    routes: {'/create': (_) => const NewUserScreen()},
   );
 }

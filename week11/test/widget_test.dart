@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -7,6 +8,9 @@ import 'package:students_api/core/api/api_client.dart';
 import 'package:students_api/core/api/api_exception.dart';
 import 'package:students_api/features/users/user.dart';
 import 'package:students_api/features/users/user_repository.dart';
+import 'package:students_api/features/users/new_user_screen.dart';
+import 'package:students_api/features/users/users_model.dart';
+import 'package:provider/provider.dart';
 
 Map<String, dynamic> _userJson(int id) => {
   'id': id,
@@ -56,5 +60,40 @@ void main() {
     final created = await repository.create(draft);
 
     expect(created.id, 11);
+  });
+
+  test('timeout becomes NoConnectionException', () async {
+    final client = MockClient(
+      (_) => Future<http.Response>.delayed(
+        const Duration(seconds: 11),
+        () => http.Response('[]', 200),
+      ),
+    );
+    final repository = UserRepository(ApiClient(client));
+
+    expect(repository.getAll(), throwsA(isA<NoConnectionException>()));
+  });
+
+  testWidgets('new user form sends one POST and closes', (tester) async {
+    var postCount = 0;
+    final client = MockClient((request) async {
+      postCount++;
+      return http.Response(jsonEncode(_userJson(11)), 201);
+    });
+    final model = UsersModel(UserRepository(ApiClient(client)));
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider.value(
+        value: model,
+        child: const MaterialApp(home: NewUserScreen()),
+      ),
+    );
+    await tester.enterText(find.byType(TextFormField).at(0), 'New User');
+    await tester.enterText(find.byType(TextFormField).at(1), 'newuser');
+    await tester.enterText(find.byType(TextFormField).at(2), 'new@example.com');
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    expect(postCount, 1);
   });
 }

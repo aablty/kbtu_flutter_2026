@@ -79,3 +79,18 @@ invalid JSON to `BadResponseException`.
 repository and starts `load()` once. `UsersScreen` subscribes with
 `context.watch<UsersModel>()`, uses `RefreshIndicator`, and switches
 exhaustively on the sealed `ApiException` hierarchy.
+
+## Level 5: two kinds of no network
+
+The repository timeout is 10 seconds. A delayed test client is converted to
+the same `NoConnectionException` as a socket failure. The UI therefore uses
+one Offline view and one Retry action for both cases.
+
+The New user form validates name, username, and email. Save is disabled while
+the POST is in flight, inserts the returned user at the top of the model list,
+and closes only after a successful 201 response. API errors stay on the form
+and are shown in a SnackBar.
+
+Airplane-mode timing, dead-Wi-Fi timing, and DevTools Network screenshots were
+not captured in this environment because no real Flutter device or DevTools
+Network session was available. No screenshots were fabricated.

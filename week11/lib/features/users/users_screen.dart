@@ -13,7 +13,16 @@ class UsersScreen extends StatelessWidget {
     final model = context.watch<UsersModel>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Users')),
+      appBar: AppBar(
+        title: const Text('Users'),
+        actions: [
+          IconButton(
+            onPressed: () => Navigator.of(context).pushNamed('/create'),
+            icon: const Icon(Icons.person_add),
+            tooltip: 'New user',
+          ),
+        ],
+      ),
       body: _buildBody(model),
     );
   }
