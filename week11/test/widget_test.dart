@@ -51,7 +51,7 @@ void main() {
     final client = MockClient(
       (_) async => http.Response(jsonEncode([_userJson(1)]), 200),
     );
-    final repository = UserRepository(
+    final repository = HttpUserRepository(
       ApiClient(client, _NoTokenStore()),
       _MemoryCache(),
     );
@@ -63,7 +63,7 @@ void main() {
 
   test('repository maps 404 to NotFoundException', () async {
     final client = MockClient((_) async => http.Response('{}', 404));
-    final repository = UserRepository(
+    final repository = HttpUserRepository(
       ApiClient(client, _NoTokenStore()),
       _MemoryCache(),
     );
@@ -77,7 +77,7 @@ void main() {
       expect(request.headers['content-type'], 'application/json');
       return http.Response(jsonEncode(_userJson(11)), 201);
     });
-    final repository = UserRepository(
+    final repository = HttpUserRepository(
       ApiClient(client, _NoTokenStore()),
       _MemoryCache(),
     );
@@ -95,7 +95,7 @@ void main() {
         () => http.Response('[]', 200),
       ),
     );
-    final repository = UserRepository(
+    final repository = HttpUserRepository(
       ApiClient(client, _NoTokenStore()),
       _MemoryCache(),
     );
@@ -110,7 +110,7 @@ void main() {
       return http.Response(jsonEncode(_userJson(11)), 201);
     });
     final model = UsersModel(
-      UserRepository(ApiClient(client, _NoTokenStore()), _MemoryCache()),
+      HttpUserRepository(ApiClient(client, _NoTokenStore()), _MemoryCache()),
     );
 
     await tester.pumpWidget(

@@ -4,29 +4,39 @@ import '../../core/api/api_client.dart';
 import '../../core/api/api_exception.dart';
 import 'user.dart';
 import 'users_cache.dart';
+import 'users_result.dart';
 
-class UserRepository {
-  UserRepository(this._api, [UsersCache? cache])
+abstract interface class UserRepository {
+  Future<UsersResult> getAll();
+
+  Future<User> getById(int id);
+
+  Future<User> create(User draft);
+}
+
+class HttpUserRepository implements UserRepository {
+  HttpUserRepository(this._api, [UsersCache? cache])
     : _cache = cache ?? UsersCache();
 
   final ApiClient _api;
   final UsersCache _cache;
 
-  Future<({List<User> items, bool fromCache})> getAll() async {
+  @override
+  Future<UsersResult> getAll() async {
     try {
       final response = await _api.get(_api.uri('/users'));
       final decoded = _api.decode(response);
-      final list = tryDecodeList(decoded);
+      final list = _decodeList(decoded);
       await _cache.save(list);
-      return (items: list, fromCache: false);
+      return UsersResult(items: list, fromCache: false);
     } on NoConnectionException {
       final saved = await _cache.load();
       if (saved == null) rethrow;
-      return (items: saved, fromCache: true);
+      return UsersResult(items: saved, fromCache: true);
     }
   }
 
-  List<User> tryDecodeList(dynamic decoded) {
+  List<User> _decodeList(dynamic decoded) {
     try {
       final list = decoded as List<dynamic>;
       return list
@@ -37,6 +47,7 @@ class UserRepository {
     }
   }
 
+  @override
   Future<User> getById(int id) async {
     final response = await _api.get(_api.uri('/users/$id'));
     final decoded = _api.decode(response);
@@ -47,6 +58,7 @@ class UserRepository {
     }
   }
 
+  @override
   Future<User> create(User draft) async {
     final response = await _api.post(
       _api.uri('/users'),

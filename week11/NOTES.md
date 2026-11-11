@@ -139,3 +139,7 @@ Network session was available. No screenshots were fabricated.
 ## Level 1 — feature-first
 
 Проект уже имел `core/` и `features/` после Practice 11–12, поэтому сохранены рабочие перемещения и добавлен `tool/check_layers.sh`. Скрипт проверяет, что HTTP-клиент не просачивается в UI, а Material не используется моделями и репозиториями. `main.dart` создаёт production HTTP-клиент через фабрику API, поэтому `package:http` остаётся в разрешённых слоях.
+
+## Level 2 — interfaces and fakes
+
+`UsersModel` получает `UserRepository` через конструктор и не создаёт HTTP-репозиторий сам. `HttpUserRepository` и `FakeUserRepository` реализуют один контракт; поэтому тест может выполнить arrange без сети, диска и эмулятора. В старой версии первый шаг такого теста — передать fake в `UsersModel` — был невозможен, потому что модель сама строила concrete repository.

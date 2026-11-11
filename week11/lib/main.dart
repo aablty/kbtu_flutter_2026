@@ -26,9 +26,12 @@ Future<void> main() async {
   const store = SecureStore();
   final token = await store.readToken();
 
-  final users = UsersModel(
-    UserRepository(ApiClient.production(store), UsersCache()),
+  final UserRepository repo = HttpUserRepository(
+    ApiClient.production(store),
+    UsersCache(),
   );
+  // final UserRepository repo = FakeUserRepository();
+  final users = UsersModel(repo);
   runApp(
     MultiProvider(
       providers: [
