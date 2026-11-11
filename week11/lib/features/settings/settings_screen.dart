@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../auth/auth_model.dart';
 import '../users/users_model.dart';
 import 'settings_model.dart';
 
@@ -49,6 +50,13 @@ class SettingsScreen extends StatelessWidget {
                 ? null
                 : () => unawaited(settings.setCity(null)),
             child: const Text('Show all cities'),
+          ),
+          const Divider(height: 32),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.logout),
+            title: const Text('Sign out'),
+            onTap: () => unawaited(context.read<AuthModel>().logout()),
           ),
         ],
       ),

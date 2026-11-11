@@ -6,26 +6,38 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
+import '../storage/secure_store.dart';
 import 'api_exception.dart';
 
 class ApiClient {
-  ApiClient(this._client, {this.host = 'jsonplaceholder.typicode.com'});
+  ApiClient(
+    this._client,
+    this._store, {
+    this.host = 'jsonplaceholder.typicode.com',
+  });
 
   final http.Client _client;
+  final SecureStore _store;
   final String host;
 
-  Map<String, String> get headers => const {'Accept': 'application/json'};
+  Future<Map<String, String>> get headers async {
+    final result = <String, String>{'Accept': 'application/json'};
+    if (await _store.readToken() case final token?) {
+      result['Authorization'] = 'Bearer $token';
+    }
+    return result;
+  }
 
   Uri uri(String path, [Map<String, String>? queryParameters]) =>
       Uri.https(host, path, queryParameters);
 
   Future<http.Response> get(Uri uri) =>
-      _send(() => _client.get(uri, headers: headers));
+      _send(() async => _client.get(uri, headers: await headers));
 
-  Future<http.Response> post(Uri uri, String body) => _send(
-    () => _client.post(
+  Future<http.Response> post(Uri uri, String body) async => _send(
+    () async => _client.post(
       uri,
-      headers: {...headers, 'Content-Type': 'application/json'},
+      headers: {...await headers, 'Content-Type': 'application/json'},
       body: body,
     ),
   );

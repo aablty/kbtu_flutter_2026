@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
+import '../auth/auth_model.dart';
 import 'user.dart';
 
 class UserDetailScreen extends StatelessWidget {
@@ -19,6 +23,20 @@ class UserDetailScreen extends StatelessWidget {
         _ValueTile(label: 'Phone', value: user.phone),
         _ValueTile(label: 'Phone digits', value: user.phoneDigits),
         _ValueTile(label: 'Website', value: user.website ?? '—'),
+        if (kDebugMode)
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.key),
+            title: const Text('Copy token to clipboard'),
+            onTap: () async {
+              final token = await context.read<AuthModel>().readTokenForDebug();
+              if (!context.mounted || token == null) return;
+              await Clipboard.setData(ClipboardData(text: token));
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(const SnackBar(content: Text('Token copied')));
+            },
+          ),
         _ValueTile(label: 'Street', value: user.address.street),
         _ValueTile(label: 'Suite', value: user.address.suite),
         _ValueTile(label: 'City', value: user.address.city),

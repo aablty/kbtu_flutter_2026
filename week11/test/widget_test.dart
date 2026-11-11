@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:students_api/core/api/api_client.dart';
 import 'package:students_api/core/api/api_exception.dart';
+import 'package:students_api/core/storage/secure_store.dart';
 import 'package:students_api/features/users/user.dart';
 import 'package:students_api/features/users/user_repository.dart';
 import 'package:students_api/features/users/new_user_screen.dart';
@@ -29,12 +30,17 @@ Map<String, dynamic> _userJson(int id) => {
   'company': {'name': 'Company', 'catchPhrase': 'Phrase'},
 };
 
+class _NoTokenStore extends SecureStore {
+  @override
+  Future<String?> readToken() async => null;
+}
+
 void main() {
   test('repository decodes a list without importing http', () async {
     final client = MockClient(
       (_) async => http.Response(jsonEncode([_userJson(1)]), 200),
     );
-    final repository = UserRepository(ApiClient(client));
+    final repository = UserRepository(ApiClient(client, _NoTokenStore()));
 
     final users = await repository.getAll();
 
@@ -43,7 +49,7 @@ void main() {
 
   test('repository maps 404 to NotFoundException', () async {
     final client = MockClient((_) async => http.Response('{}', 404));
-    final repository = UserRepository(ApiClient(client));
+    final repository = UserRepository(ApiClient(client, _NoTokenStore()));
 
     expect(repository.getById(999), throwsA(isA<NotFoundException>()));
   });
@@ -54,7 +60,7 @@ void main() {
       expect(request.headers['content-type'], 'application/json');
       return http.Response(jsonEncode(_userJson(11)), 201);
     });
-    final repository = UserRepository(ApiClient(client));
+    final repository = UserRepository(ApiClient(client, _NoTokenStore()));
     final draft = User.fromJson(_userJson(1));
 
     final created = await repository.create(draft);
@@ -69,7 +75,7 @@ void main() {
         () => http.Response('[]', 200),
       ),
     );
-    final repository = UserRepository(ApiClient(client));
+    final repository = UserRepository(ApiClient(client, _NoTokenStore()));
 
     expect(repository.getAll(), throwsA(isA<NoConnectionException>()));
   });
@@ -80,7 +86,9 @@ void main() {
       postCount++;
       return http.Response(jsonEncode(_userJson(11)), 201);
     });
-    final model = UsersModel(UserRepository(ApiClient(client)));
+    final model = UsersModel(
+      UserRepository(ApiClient(client, _NoTokenStore())),
+    );
 
     await tester.pumpWidget(
       ChangeNotifierProvider.value(
