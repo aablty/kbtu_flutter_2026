@@ -10,6 +10,11 @@ import '../storage/secure_store.dart';
 import 'api_exception.dart';
 
 class ApiClient {
+  factory ApiClient.production(
+    SecureStore store, {
+    String host = 'jsonplaceholder.typicode.com',
+  }) => ApiClient(http.Client(), store, host: host);
+
   ApiClient(
     this._client,
     this._store, {

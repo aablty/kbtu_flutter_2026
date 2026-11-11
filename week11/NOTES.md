@@ -133,3 +133,9 @@ Network session was available. No screenshots were fabricated.
 Ссылки собираются как `mailto:`, `tel:` через `phoneDigits` и `https:` для сайта; возвращаемый `bool` от `launchUrl` превращается в сообщение `No app can open this`.
 
 Скриншоты `screenshot_offline_banner.png` и `screenshot_permission_dialog.png` не создавались без реального устройства/эмулятора: файлы не подменялись искусственными изображениями.
+
+# Practice 13 — заметки
+
+## Level 1 — feature-first
+
+Проект уже имел `core/` и `features/` после Practice 11–12, поэтому сохранены рабочие перемещения и добавлен `tool/check_layers.sh`. Скрипт проверяет, что HTTP-клиент не просачивается в UI, а Material не используется моделями и репозиториями. `main.dart` создаёт production HTTP-клиент через фабрику API, поэтому `package:http` остаётся в разрешённых слоях.
